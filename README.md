@@ -1,0 +1,1 @@
+# django-blog-w-dockercompose
