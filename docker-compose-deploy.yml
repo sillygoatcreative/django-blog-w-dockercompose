@@ -1,5 +1,11 @@
 version: '3.3'
 
+networks:
+    web:
+        external: true
+    internal:
+        external: false
+
 services:
   app:
     build:
@@ -14,6 +20,10 @@ services:
       - DB_PASS=${DB_PASS}
       - SECRET_KEY=${SECRET_KEY}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    labels:
+      - traefik.enable=false
+    networks:
+        - internal
     depends_on:
       - db
 
@@ -26,11 +36,22 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
+    labels:
+      - traefik.enable=false
 
   proxy:
     build:
       context: ./proxy
     restart: always
+    labels: 
+      - traefik.http.routers.blogd.rule=Host(`blogd.rwrm.net`)
+      - traefik.http.routers.blogd.tls=true
+      - traefik.http.routers.blogd.tls.certresolver=lets-encrypt
+      - traefik.port=8001
+    networks:
+      - internal
+      - web
+
     depends_on:
       - app
     ports:
