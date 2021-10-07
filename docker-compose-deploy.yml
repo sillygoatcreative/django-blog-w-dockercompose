@@ -38,6 +38,9 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
     labels:
       - traefik.enable=false
+    networks:
+      - internal
+
 
   proxy:
     build:
